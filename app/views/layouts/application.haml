@@ -1,0 +1,38 @@
+!!!
+%html
+  %head
+    %title MovieRama
+    %meta{ 'http-equiv' => 'content-type', content: "text/html;charset=UTF-8" }/
+    %meta{ charset: 'utf-8' }/
+    %meta{ name: 'viewport',  content: "width=device-width, initial-scale=1.0" }/
+    %link{ rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,700' }/
+
+    = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true
+    = javascript_include_tag 'application', 'data-turbolinks-track' => true
+    = csrf_meta_tags
+  %body
+    %nav.navbar.navbar-default{ role: 'navigation' }
+      .container
+        .navbar-header
+          %a.navbar-brand{ href: root_path } MovieRama
+        - if current_user
+          %p.navbar-text.navbar-right
+            Welcome back,
+            %span#username= current_user.name
+            = link_to session_path, method: :delete do
+              Log out
+        - else
+          %a.navbar-right.btn.navbar-btn{ href: '/auth/github' }
+            Log in
+          %a.navbar-right.btn.navbar-btn{ href: '/auth/github' }
+            Sign up
+
+    .container
+      .row
+        .col-md-12
+          - flash.each do |name, message|
+            .alert.alert-info.mr-flash{class: "flash-#{name}"}= message
+
+    = yield
+
+

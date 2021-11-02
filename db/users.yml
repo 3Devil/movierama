@@ -1,0 +1,9 @@
+- name: John McFoo
+  uid:  'null|johnmcfoo'
+- name: Alice Wallace
+  uid:  'null|alice'
+- name: Bob Ablleton
+  uid:  'null|bob'
+- name: Charlie O'Callaghan
+  uid:  'null|charlie'
+

@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# APP_PATH = File.expand_path('../../config/application',  __FILE__)
+# require_relative '../config/boot'
+require 'rubygems'
+require 'bundler/setup'
+require './config/environment'
+
+srand(21378)
+
+# Clear all records
+Ohm.redis.call 'FLUSHDB'
+
+# Load seed records
+[Movie, User].each do |model|
+  YAML.load_file("db/#{model.to_s.downcase}s.yml").each do |attrs|
+    model.create(attrs)
+  end
+end
+
+# Randomly assign users
+all_users = User.all.to_a
+Movie.all.each do |movie|
+  user = all_users[rand(all_users.size)]
+  movie.update(user: user)
+end
+
+# Randomly create likes/hates
+Movie.all.each do |movie|
+  User.all.each do |user|
+    next if movie.user == user
+    case rand(4)
+    when 0 then VotingBooth.new(user, movie).vote(:like)
+    when 1 then VotingBooth.new(user, movie).vote(:hate)
+    end
+  end
+end

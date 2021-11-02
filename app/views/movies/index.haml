@@ -1,0 +1,73 @@
+
+
+
+.container
+  .row
+    .col-md-12
+      .page-header
+        - if @submitter
+          %h2
+            Movies
+            %small submitted by #{@submitter.name}
+        - else
+          %h2 Movies
+
+  .row.mr-sorter
+    .col-md-12
+      .well.well-sm
+        Sort by
+        = link_to('likers', by: 'likers')
+        |
+        = link_to('haters', by: 'haters')
+        |
+        = link_to('date', by: 'date')
+
+  .row
+    .col-md-9
+      - @movies.each do |movie|
+        - movie = MovieDecorator.new(movie)
+        .mr-movie.panel.panel-default
+          .panel-heading
+            %h4.mr-movie-title= movie.title
+          .panel-body
+            %p
+              Posted by
+              = link_to movie.user.name, user_movies_path(movie.user.id)
+              = time_ago_in_words(movie.created_at)
+              ago
+            %p.mr-movie-description= movie.description
+            %p.mr-release-date
+              Released
+              = movie.date
+          .panel-footer
+            .mr-movie-votes.pull-left
+              - if movie.has_votes?
+                = pluralize(movie.count_likers, 'like')
+                |
+                = pluralize(movie.count_haters, 'hate')
+              - elsif can?(:vote, movie)
+                Be the first to vote for this movie
+              - else
+                No votes yet
+            - if current_user && can?(:vote, movie)
+              .mr-movie-voting.pull-right
+                - if current_user.likes?(movie)
+                  You like this movie 
+                  = link_to movie_vote_path(movie), method: :delete do
+                    Unlike
+                - elsif current_user.hates?(movie)
+                  You hate this movie 
+                  = link_to movie_vote_path(movie), method: :delete do
+                    Unhate
+                - else
+                  = link_to movie_vote_path(movie, t:'like'), method: :post do
+                    Like
+                  |
+                  = link_to movie_vote_path(movie, t:'hate'), method: :post do
+                    Hate
+            .clearfix
+    .col-md-3
+      - if can? :create, Movie
+        .btn-group.btn-group-justified
+          %a.btn.btn-primary{ href: new_movie_path }
+            Add movie

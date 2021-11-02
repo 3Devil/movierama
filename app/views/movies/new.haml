@@ -1,0 +1,23 @@
+
+.container
+  .row
+    .col-md-12
+      .page-header
+        %h2 Submit a movie
+  .row
+    .col-md-9
+      = form_tag movies_path, { class: 'form', role: 'form' } do
+        .form-group{ class: @validator.class_for(:title) }
+          %label{ for:  'title' } Title
+          %input.form-control{ name: 'title', value: @movie.title  }
+        .form-group{ class: @validator.class_for(:description) }
+          %label{ for: 'description' } Description
+          %textarea.form-control{ name: 'description' }
+            = @movie.description
+        .form-group{ class: @validator.class_for(:date) }
+          %label{ for:  'date' } Date
+          %input.form-control{ name: 'date', type: 'date', value: @movie.date }
+        .form-group
+          = submit_tag 'Add movie', class: 'btn btn-primary'
+       
+
