@@ -2,6 +2,7 @@ class Movie < BaseModel
   include Ohm::Timestamps
 
   attribute :title
+  index :title
   attribute :date
   attribute :description
 
@@ -12,5 +13,12 @@ class Movie < BaseModel
 
   set :likers, :User
   set :haters, :User
-end
 
+  def self.liked_by(uid)
+    Movie.all.select { |mv| mv.likers.any? { |u| u.uid == uid } }
+  end
+
+  def self.hated_by(uid)
+    Movie.all.select { |mv| mv.haters.any? { |u| u.uid == uid } }
+  end
+end

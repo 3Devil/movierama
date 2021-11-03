@@ -38,8 +38,18 @@ module Pages
       end
     end
 
+    def button_click(attr)
+      within(page.find('.mr-buttons')) do
+        click_on(attr)
+      end
+    end
+
     def movie_titles
       page.all('.mr-movie-title').map(&:text)
+    end
+
+    def movie_liked_by(title)
+      _movie_node(title).all('.mr-liked-by').map(&:text).first
     end
 
     def has_vote_message?
@@ -57,4 +67,3 @@ module Pages
     end
   end
 end
-

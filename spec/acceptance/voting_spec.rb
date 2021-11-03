@@ -73,9 +73,39 @@ RSpec.describe 'vote on movies', type: :feature do
         page.like('The Party')
       }.to raise_error(Capybara::ElementNotFound)
     end
+
+    it 'can show last two likers of own movies' do
+      user = User.create(
+        uid:  'null|23456',
+        name: 'John Smith'
+      )
+      user2 = User.create(
+        uid:  'null|34567',
+        name: 'John Smith2'
+      )
+      user3 = User.create(
+        uid:  'null|45678',
+        name: 'John Smith3'
+      )
+
+      Pages::MovieNew.new.open.submit(
+        title:       'The Party',
+        date:        '1969-08-13',
+        description: 'Birdy nom nom')
+
+      movie = Movie.find(title: 'The Party').to_a.first
+      VotingBooth.new(user, movie).vote(:like)
+      VotingBooth.new(user2, movie).vote(:like)
+      VotingBooth.new(user3, movie).vote(:like)
+      movie = Movie.find(title: 'Empire strikes back').to_a.first
+      VotingBooth.new(user, movie).vote(:like)
+      VotingBooth.new(user2, movie).vote(:like)
+      VotingBooth.new(user3, movie).vote(:like)
+
+      page.open
+      expect(page.movie_liked_by('The Party')).to eq("#{user3.name}, #{user2.name}")
+      expect(page.movie_liked_by('Empire strikes back')).to be_nil
+    end
   end
 
 end
-
-
-

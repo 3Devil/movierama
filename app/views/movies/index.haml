@@ -16,11 +16,11 @@
     .col-md-12
       .well.well-sm
         Sort by
-        = link_to('likers', by: 'likers')
+        = @filter_by ? link_to('likers', by: 'likers', filter_by: @filter_by) : link_to('likers', by: 'likers')
         |
-        = link_to('haters', by: 'haters')
+        = @filter_by ? link_to('haters', by: 'haters', filter_by: @filter_by) : link_to('haters', by: 'haters')
         |
-        = link_to('date', by: 'date')
+        = @filter_by ? link_to('date', by: 'date', filter_by: @filter_by) : link_to('date', by: 'date')
 
   .row
     .col-md-9
@@ -66,7 +66,23 @@
                   = link_to movie_vote_path(movie, t:'hate'), method: :post do
                     Hate
             .clearfix
-    .col-md-3
+            - if current_user && movie.user.id == current_user.id && movie.liker_count.to_i > 0
+              Last liked by:
+              %span.mr-liked-by= movie.likers.to_a.last(2).reverse.map(&:name).join(', ')
+    .col-md-3.mr-buttons
+      - if current_user
+        .btn-group.btn-group-justified
+          %a.btn.btn-primary{ href: root_path }
+            All movies
+        .btn-group.btn-group-justified
+          %a.btn.btn-primary{ href: root_path(filter_by: 'like') }
+            Liked movies
+        .btn-group.btn-group-justified
+          %a.btn.btn-primary{ href: root_path(filter_by: 'hate') }
+            Hated movies
+        .btn-group.btn-group-justified
+          %a.btn.btn-primary{ href: root_path(user_id: current_user.id) }
+            My Movies
       - if can? :create, Movie
         .btn-group.btn-group-justified
           %a.btn.btn-primary{ href: new_movie_path }

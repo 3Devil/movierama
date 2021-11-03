@@ -3,19 +3,24 @@ class MoviesController < ApplicationController
     # TODO: extract loginc into a Search service
     if _index_params[:user_id]
       @submitter = User[_index_params[:user_id]]
-      scope = Movie.find(user_id: @submitter.id)
+      scope = Movie.find(user_id: @submitter.id).to_a
+    elsif _index_params[:filter_by] && current_user
+      @filter_by = _index_params[:filter_by]
+      scope = @filter_by == 'like' ? Movie.liked_by(current_user.uid) : Movie.hated_by(current_user.uid)
     else
-      scope = Movie.all
+      scope = Movie.all.to_a
     end
 
     @movies = case _index_params.fetch(:by, 'likers')
-    when 'likers'
-      scope.sort(by: 'Movie:*->liker_count', order: 'DESC')
-    when 'haters'
-      scope.sort(by: 'Movie:*->hater_count', order: 'DESC')
-    when 'date'
-      scope.sort(by: 'Movie:*->created_at',  order: 'DESC')
-    end
+              when 'likers'
+                scope.sort_by { |m| m.liker_count.to_i }.reverse
+              when 'haters'
+                scope.sort_by { |m| m.hater_count.to_i }.reverse
+              when 'date'
+                scope.sort_by(&:created_at).reverse
+              else
+                scope
+              end
   end
 
   def new
@@ -45,7 +50,7 @@ class MoviesController < ApplicationController
   private
 
   def _index_params
-    params.permit(:by, :user_id)
+    params.permit(:by, :user_id, :filter_by)
   end
 
   def _create_params
